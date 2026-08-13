@@ -20,8 +20,13 @@ out/
 build/
 dist/
 
-# IDE / System
+# IDE / System / Docs
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
+docs/
+DECISION_LOG.md
+ROADMAP_DECISION_TREES.md
+GIT_COMMIT_PACING_AND_BEST_PRACTICES.md
+scripts/
