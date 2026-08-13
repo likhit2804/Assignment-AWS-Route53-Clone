@@ -61,11 +61,11 @@ async def get_zone_by_id(db: AsyncSession, zone_id: str) -> Optional[HostedZone]
 
 async def create_zone(db: AsyncSession, data: HostedZoneCreate) -> HostedZone:
     """
-    Create a new Hosted Zone.
-    
-    Decision: caller_reference auto-generated as UUID if not provided by the client.
-    AWS Route53 uses caller_reference for request idempotency — sending the same 
-    caller_reference twice returns the existing zone instead of creating a duplicate.
+    Create a new Hosted Zone and seed default NS + SOA records.
+
+    Decision: AWS Route53 automatically creates NS and SOA records for every
+    new hosted zone. We replicate that behaviour here so the UI always shows
+    at least 2 records immediately after creation.
     """
     zone = HostedZone(
         name=data.name,
@@ -76,6 +76,42 @@ async def create_zone(db: AsyncSession, data: HostedZoneCreate) -> HostedZone:
         record_count=0,
     )
     db.add(zone)
+    await db.flush()   # Get zone.id assigned before seeding records
+
+    # Normalise domain name (ensure trailing dot)
+    apex = data.name if data.name.endswith(".") else f"{data.name}."
+
+    # Seed default NS record
+    ns_record = DNSRecord(
+        hosted_zone_id=zone.id,
+        name=apex,
+        type="NS",
+        ttl=172800,
+        records=[
+            "ns-1.awsdns-01.com.",
+            "ns-2.awsdns-01.net.",
+            "ns-3.awsdns-01.org.",
+            "ns-4.awsdns-01.co.uk.",
+        ],
+        routing_policy="Simple",
+    )
+    db.add(ns_record)
+
+    # Seed default SOA record
+    soa_record = DNSRecord(
+        hosted_zone_id=zone.id,
+        name=apex,
+        type="SOA",
+        ttl=900,
+        records=[
+            f"ns-1.awsdns-01.com. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400"
+        ],
+        routing_policy="Simple",
+    )
+    db.add(soa_record)
+
+    await db.flush()
+    zone.record_count = 2
     await db.flush()
     await db.refresh(zone)
     return zone

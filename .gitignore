@@ -20,13 +20,13 @@ out/
 build/
 dist/
 
-# IDE / System / Docs
+# IDE / System
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
-docs/
-DECISION_LOG.md
-ROADMAP_DECISION_TREES.md
-GIT_COMMIT_PACING_AND_BEST_PRACTICES.md
 scripts/
+docs/
+main/
+Route 53 _ Global.html
+start_dev.bat

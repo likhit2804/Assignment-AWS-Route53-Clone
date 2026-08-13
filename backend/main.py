@@ -15,7 +15,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.database import init_db
-from backend.routers import auth, hosted_zones, records
+from backend.routers import auth, hosted_zones, records, bind
 
 
 @asynccontextmanager
