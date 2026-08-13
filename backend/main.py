@@ -58,6 +58,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(hosted_zones.router)
 app.include_router(records.router)
+app.include_router(bind.router)
 
 
 @app.get("/", tags=["Health"])
