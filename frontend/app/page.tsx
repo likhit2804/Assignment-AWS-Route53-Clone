@@ -9,7 +9,7 @@ export default function Route53LandingPage() {
   const router = useRouter();
 
   return (
-    <div className="flex-1 bg-white text-gray-900 font-sans pb-16 select-none">
+    <div className="flex-1 overflow-y-auto bg-white text-gray-900 font-sans pb-16 select-none">
       
       {/* ── 1. Hero Dark Banner (Exact match to AWS Overview Page) ──────────────── */}
       <div className="bg-[#16191f] text-white p-6 md:p-10 relative">

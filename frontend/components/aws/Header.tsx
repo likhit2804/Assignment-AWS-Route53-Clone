@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Search, Globe, ChevronDown, Bell, HelpCircle, Settings, Terminal, Grid, Menu, User, LogOut, LogIn, Check } from "lucide-react";
+import { Search, Globe, ChevronDown, Bell, HelpCircle, Settings, Terminal, Grid, Menu, User, LogOut, LogIn, Check, Sun, Moon, X } from "lucide-react";
 import Link from "next/link";
 import { AwsLogoWithSmile } from "./Route53Icons";
 
@@ -9,10 +9,94 @@ interface HeaderProps {
   onToggleSidebar?: () => void;
 }
 
+interface ServiceItem {
+  name: string;
+  desc: string;
+  href: string;
+}
+
+const CATEGORIES = [
+  "Recently visited",
+  "Favourites",
+  "All applications",
+  "All services",
+  "divider",
+  "Analytics",
+  "Application Integration",
+  "Blockchain",
+  "Business Applications",
+  "Cloud Financial Management",
+  "Compute",
+  "Containers",
+  "Customer Enablement",
+  "Database",
+  "Developer Tools",
+  "End User Computing",
+  "Front-end Web & Mobile",
+  "Game Development",
+  "Internet of Things",
+  "Machine Learning",
+  "Management & Governance",
+  "Media Services",
+  "Migration & Transfer",
+  "Networking & Content Delivery",
+  "Quantum Technologies",
+  "Satellite",
+  "Security, Identity, & Compliance",
+  "Storage"
+];
+
+const SERVICES_BY_CATEGORY: Record<string, ServiceItem[]> = {
+  "Recently visited": [
+    { name: "Route 53", desc: "Scalable DNS and Domain Name Registration", href: "/hosted-zones" },
+    { name: "Console Home", desc: "View resource insights, service shortcuts, and feature updates", href: "/dashboard" },
+    { name: "CloudFormation", desc: "Create and Manage Resources with Templates", href: "/coming-soon?section=cloudformation" },
+    { name: "DynamoDB", desc: "Managed NoSQL Database", href: "/coming-soon?section=dynamodb" },
+    { name: "CloudWatch", desc: "Monitor Resources and Applications", href: "/coming-soon?section=cloudwatch" },
+    { name: "Lambda", desc: "Run code without thinking about servers", href: "/coming-soon?section=lambda" },
+    { name: "IAM", desc: "Manage access to AWS resources", href: "/coming-soon?section=iam" },
+    { name: "AWS Health Dashboard", desc: "Personalized view of AWS service health", href: "/coming-soon?section=health-dashboard" },
+    { name: "API Gateway", desc: "Build, Deploy and Manage APIs", href: "/coming-soon?section=api-gateway" },
+    { name: "Simple Queue Service", desc: "SQS Managed Message Queues", href: "/coming-soon?section=sqs" },
+    { name: "S3", desc: "Scalable Storage in the Cloud", href: "/coming-soon?section=s3" },
+    { name: "Activate for Startups", desc: "AWS Activate provides resources to help startups build and grow on AWS", href: "/coming-soon?section=activate" },
+    { name: "VPC", desc: "Isolated Cloud Resources", href: "/coming-soon?section=vpc" },
+    { name: "AWS Resource Explorer", desc: "Easily search for and discover relevant resources across AWS", href: "/coming-soon?section=resource-explorer" },
+    { name: "Billing and Cost Management", desc: "View and pay bills, analyze and govern your costs", href: "/coming-soon?section=billing" }
+  ],
+  "Networking & Content Delivery": [
+    { name: "Route 53", desc: "Scalable DNS and Domain Name Registration", href: "/hosted-zones" },
+    { name: "VPC", desc: "Isolated Cloud Resources", href: "/coming-soon?section=vpc" },
+    { name: "CloudFront", desc: "Global Content Delivery Network", href: "/coming-soon?section=cloudfront" },
+    { name: "API Gateway", desc: "Build, Deploy and Manage APIs", href: "/coming-soon?section=api-gateway" },
+    { name: "Direct Connect", desc: "Dedicated Network Connection to AWS", href: "/coming-soon?section=direct-connect" }
+  ],
+  "Compute": [
+    { name: "EC2", desc: "Virtual Servers in the Cloud", href: "/coming-soon?section=ec2" },
+    { name: "Lambda", desc: "Run code without thinking about servers", href: "/coming-soon?section=lambda" },
+    { name: "Lightsail", desc: "Easy-to-use Virtual Private Servers", href: "/coming-soon?section=lightsail" },
+    { name: "Elastic Beanstalk", desc: "Run and Manage Web Apps", href: "/coming-soon?section=beanstalk" }
+  ],
+  "Database": [
+    { name: "DynamoDB", desc: "Managed NoSQL Database", href: "/coming-soon?section=dynamodb" },
+    { name: "RDS", desc: "Managed Relational Database Service", href: "/coming-soon?section=rds" },
+    { name: "ElastiCache", desc: "In-Memory Database & Cache", href: "/coming-soon?section=elasticache" },
+    { name: "Redshift", desc: "Fast, Simple, Cost-Effective Data Warehousing", href: "/coming-soon?section=redshift" }
+  ],
+  "Storage": [
+    { name: "S3", desc: "Scalable Storage in the Cloud", href: "/coming-soon?section=s3" },
+    { name: "EFS", desc: "Managed File Storage for EC2", href: "/coming-soon?section=efs" },
+    { name: "Glacier", desc: "Archive Storage in the Cloud", href: "/coming-soon?section=glacier" },
+    { name: "Storage Gateway", desc: "Hybrid Storage Integration", href: "/coming-soon?section=storage-gateway" }
+  ]
+};
+
 export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const [searchValue, setSearchValue] = useState("");
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState("Recently visited");
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -58,13 +142,41 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
     return () => window.removeEventListener("keydown", handleKeyDown, true);
   }, []);
 
-  // Load auth state from localStorage
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  // Load auth and theme states from localStorage
   useEffect(() => {
     const storedAuth = localStorage.getItem("aws_route53_auth");
     if (storedAuth !== null) {
       setIsLoggedIn(storedAuth === "true");
     }
+
+    const savedTheme = localStorage.getItem("theme");
+    const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    if (savedTheme === "dark" || (!savedTheme && systemPrefersDark)) {
+      setTheme("dark");
+      document.documentElement.classList.add("dark");
+      document.body.classList.add("dark");
+    } else {
+      setTheme("light");
+      document.documentElement.classList.remove("dark");
+      document.body.classList.remove("dark");
+    }
   }, []);
+
+  const toggleTheme = () => {
+    if (theme === "light") {
+      setTheme("dark");
+      document.documentElement.classList.add("dark");
+      document.body.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      setTheme("light");
+      document.documentElement.classList.remove("dark");
+      document.body.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  };
 
   const toggleAuth = () => {
     const nextState = !isLoggedIn;
@@ -87,18 +199,21 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
 
           {/* AWS Smile Logo */}
           <Link href="/" className="flex items-center space-x-1.5 group pr-1 hover:opacity-90 transition-opacity">
-            <AwsLogoWithSmile className="h-6 w-auto" />
+            <img src="/logo.png" className="h-6 w-auto object-contain" alt="AWS Console" />
           </Link>
 
-          {/* Hexagon App Switcher & Grid Menu */}
-          <div className="hidden sm:flex items-center space-x-2 text-gray-400">
-            <button className="p-1 hover:text-white hover:bg-gray-800 rounded" title="AWS Services">
-              <div className="w-4 h-4 rounded bg-purple-600 flex items-center justify-center text-[9px] font-bold text-white">
-                ⬡
-              </div>
-            </button>
-            <button className="p-1 hover:text-white hover:bg-gray-800 rounded" title="Service Menu">
+          {/* Services Dropdown Trigger */}
+          <div className="hidden sm:flex items-center space-x-2">
+            <button
+              onClick={() => setServicesDropdownOpen(!servicesDropdownOpen)}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold transition-colors border ${
+                servicesDropdownOpen
+                  ? "bg-[#16191f] border-gray-600 text-white font-bold"
+                  : "bg-[#0f1b2a] border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800"
+              }`}
+            >
               <Grid className="w-3.5 h-3.5" />
+              <span>Services</span>
             </button>
           </div>
         </div>
@@ -160,6 +275,19 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               </div>
             )}
           </div>
+
+          {/* Theme Toggle (Dark / Light) */}
+          <button
+            onClick={toggleTheme}
+            className="p-1 hover:text-white hover:bg-gray-800 rounded transition-colors"
+            title={theme === "light" ? "Switch to Dark theme" : "Switch to Light theme"}
+          >
+            {theme === "light" ? (
+              <Moon className="w-3.5 h-3.5 text-gray-300" />
+            ) : (
+              <Sun className="w-3.5 h-3.5 text-gray-300" />
+            )}
+          </button>
 
           {/* Help & Settings */}
           <button className="p-1 hover:text-white hover:bg-gray-800 rounded transition-colors" title="Documentation & Support">
@@ -232,6 +360,92 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
           </div>
         </div>
       </header>
+
+      {/* Services Dropdown Panel */}
+      {servicesDropdownOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 top-10 bg-black/40 z-40 transition-opacity"
+            onClick={() => setServicesDropdownOpen(false)}
+          />
+
+          {/* Panel Container */}
+          <div className="fixed top-10 left-0 bottom-0 w-full max-w-4xl bg-[#161d26] text-white flex z-50 shadow-2xl border-r border-gray-800 animate-fadeIn text-xs">
+            {/* Left Categories Sidebar */}
+            <div className="w-60 bg-[#1c2736] border-r border-gray-800 overflow-y-auto py-3">
+              {CATEGORIES.map((cat, idx) => {
+                if (cat === "divider") {
+                  return <div key={`div-${idx}`} className="border-b border-gray-700/50 my-2 mx-4" />;
+                }
+                const isSelected = activeCategory === cat;
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCategory(cat)}
+                    className={`w-full text-left px-5 py-2 transition-colors flex items-center justify-between font-medium ${
+                      isSelected
+                        ? "bg-[#161d26] text-blue-400 font-bold border-l-4 border-aws-blue"
+                        : "text-gray-300 hover:text-white hover:bg-[#202e40]"
+                    }`}
+                  >
+                    <span>{cat}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Right Services View Area */}
+            <div className="flex-1 bg-[#161d26] overflow-y-auto p-6 flex flex-col">
+              {/* Header */}
+              <div className="flex items-center justify-between pb-3 border-b border-gray-800 mb-4">
+                <h2 className="text-sm font-bold text-white tracking-wide">{activeCategory}</h2>
+                <button
+                  onClick={() => setServicesDropdownOpen(false)}
+                  className="text-gray-400 hover:text-white p-1 rounded hover:bg-gray-800 transition-colors"
+                  aria-label="Close menu"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Service List Grid */}
+              {SERVICES_BY_CATEGORY[activeCategory] ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                  {SERVICES_BY_CATEGORY[activeCategory].map((svc) => (
+                    <Link
+                      key={svc.name}
+                      href={svc.href}
+                      onClick={() => setServicesDropdownOpen(false)}
+                      className="p-3 rounded border border-transparent hover:border-gray-800 hover:bg-gray-800/30 group transition-all"
+                    >
+                      <span className="block text-white font-bold group-hover:text-blue-400 transition-colors">
+                        {svc.name}
+                      </span>
+                      <span className="block text-[11px] text-gray-400 mt-0.5 leading-normal">
+                        {svc.desc}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex-1 flex flex-col items-center justify-center py-20 text-gray-400">
+                  <div className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center mb-3">
+                    <Grid className="w-5 h-5 text-gray-500" />
+                  </div>
+                  <span className="font-semibold text-gray-300 mb-1">"{activeCategory}" Services</span>
+                  <p className="text-[11px] text-center max-w-xs leading-relaxed text-gray-500">
+                    No mock services are defined in this category for this assignment console clone.
+                  </p>
+                  <p className="text-[11px] text-center mt-2">
+                    Try selecting <span className="text-blue-400 font-semibold font-mono">Recently visited</span> or <span className="text-blue-400 font-semibold font-mono">Networking & Content Delivery</span>.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 };

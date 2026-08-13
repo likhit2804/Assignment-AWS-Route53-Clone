@@ -8,7 +8,13 @@ from sqlalchemy.engine import Engine
 # Database file location
 BASE_DIR = Path(__file__).resolve().parent
 DB_PATH = BASE_DIR / "route53.db"
-DATABASE_URL = f"sqlite+aiosqlite:///{DB_PATH}"
+
+# Allow override via environment variable for production deployments (e.g. Render persistent disk)
+DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite+aiosqlite:///{DB_PATH}")
+
+# Ensure it uses the async sqlite driver
+if DATABASE_URL.startswith("sqlite://") and not DATABASE_URL.startswith("sqlite+aiosqlite://"):
+    DATABASE_URL = DATABASE_URL.replace("sqlite://", "sqlite+aiosqlite://", 1)
 
 # Create async engine for SQLite
 engine = create_async_engine(

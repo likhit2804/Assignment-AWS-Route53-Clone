@@ -10,12 +10,12 @@ export function ConsoleShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
-    <div className="min-h-screen flex flex-col font-sans antialiased text-aws-text bg-[#f2f3f3]">
+    <div className="min-h-screen flex flex-col font-sans antialiased text-aws-text dark:text-gray-200 bg-[#f2f3f3] dark:bg-[#0f141c] transition-colors">
       {/* AWS Top Navigation Header */}
       <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
       {/* Sub-Header Bar with Blue Circle Hamburger Button */}
-      <div className="bg-white border-b border-gray-300 h-10 flex items-center px-3 text-xs text-gray-700 space-x-2 select-none z-30 flex-shrink-0">
+      <div className="bg-white dark:bg-[#0f141c] border-b border-gray-300 dark:border-gray-800 h-10 flex items-center px-3 text-xs text-gray-700 dark:text-gray-300 space-x-2 select-none z-30 flex-shrink-0 transition-colors">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="w-7 h-7 rounded-full bg-[#0073bb] hover:bg-[#005999] text-white flex items-center justify-center transition-colors shadow-sm"
@@ -31,7 +31,7 @@ export function ConsoleShell({ children }: { children: React.ReactNode }) {
         <Sidebar collapsed={!sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
         {/* Page View Container with Smooth Transition */}
-        <main className="flex-1 bg-white min-w-0 flex flex-col overflow-y-auto min-h-[calc(100vh-6.5rem)] transition-all duration-300 ease-in-out">
+        <main className="flex-1 bg-white dark:bg-[#0f141c] min-w-0 flex flex-col overflow-hidden h-[calc(100vh-5rem)] transition-all duration-300 ease-in-out">
           {children}
         </main>
       </div>

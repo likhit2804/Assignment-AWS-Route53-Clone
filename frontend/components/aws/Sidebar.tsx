@@ -17,7 +17,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onClose }) 
 
   return (
     <aside
-      className={`bg-white border-gray-300 flex flex-col select-none flex-shrink-0 text-xs text-gray-800 transition-all duration-300 ease-in-out overflow-hidden z-20 ${
+      className={`bg-white dark:bg-[#0f141c] border-gray-300 dark:border-gray-800 flex flex-col select-none flex-shrink-0 text-xs text-gray-800 dark:text-gray-300 transition-all duration-300 ease-in-out overflow-hidden z-20 ${
         collapsed
           ? "w-0 border-r-0 opacity-0 pointer-events-none"
           : "w-56 border-r opacity-100"
@@ -27,13 +27,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onClose }) 
       <div className="w-56 flex flex-col h-full min-h-[calc(100vh-6.5rem)]">
         
         {/* Sidebar Header: Route 53 Title (Links to Landing Page) + Left Chevron Collapse Button */}
-        <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between font-bold text-sm text-gray-900 flex-shrink-0">
+        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between font-bold text-sm text-gray-900 dark:text-white flex-shrink-0">
           <Link href="/" className="hover:text-[#0073bb] transition-colors" title="Route 53 Overview / Landing Page">
             Route 53
           </Link>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-900 p-1 rounded hover:bg-gray-100 transition-colors"
+            className="text-gray-500 hover:text-gray-900 dark:hover:text-white p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             title="Collapse navigation"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -48,7 +48,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onClose }) 
             <Link
               href="/dashboard"
               className={`block px-3 py-1.5 rounded transition-colors ${
-                pathname === "/dashboard" ? "font-semibold text-aws-text bg-gray-100" : "text-gray-700 hover:bg-gray-50"
+                pathname === "/dashboard" ? "font-semibold text-aws-text dark:text-white bg-gray-100 dark:bg-[#202734]" : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40"
               }`}
             >
               Dashboard
@@ -57,7 +57,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onClose }) 
             <Link
               href="/hosted-zones"
               className={`block px-3 py-1.5 rounded transition-colors ${
-                pathname.startsWith("/hosted-zones") ? "font-semibold text-aws-text bg-gray-100" : "text-gray-700 hover:bg-gray-50"
+                pathname.startsWith("/hosted-zones") ? "font-semibold text-aws-text dark:text-white bg-gray-100 dark:bg-[#202734]" : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40"
               }`}
             >
               Hosted zones
@@ -66,7 +66,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onClose }) 
             <Link
               href="/coming-soon?section=health-checks"
               className={`block px-3 py-1.5 rounded transition-colors ${
-                pathname.startsWith("/health-checks") ? "font-semibold text-aws-text bg-gray-100" : "text-gray-700 hover:bg-gray-50"
+                pathname.startsWith("/health-checks") ? "font-semibold text-aws-text dark:text-white bg-gray-100 dark:bg-[#202734]" : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40"
               }`}
             >
               Health checks
@@ -75,7 +75,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onClose }) 
             <Link
               href="/coming-soon?section=profiles"
               className={`block px-3 py-1.5 rounded transition-colors ${
-                pathname.startsWith("/profiles") ? "font-semibold text-aws-text bg-gray-100" : "text-gray-700 hover:bg-gray-50"
+                pathname.startsWith("/profiles") ? "font-semibold text-aws-text dark:text-white bg-gray-100 dark:bg-[#202734]" : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/40"
               }`}
             >
               Profiles
@@ -83,23 +83,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onClose }) 
           </div>
 
           {/* Accordion 1: Global Resolver */}
-          <div className="mt-3 pt-2 border-t border-gray-100">
+          <div className="mt-3 pt-2 border-t border-gray-100 dark:border-gray-800">
             <button
               onClick={() => setGlobalResolverOpen(!globalResolverOpen)}
-              className="w-full flex items-center justify-start gap-1 px-3 py-1 font-bold text-gray-900 hover:bg-gray-50 transition-colors text-left"
+              className="w-full flex items-center justify-start gap-1 px-3 py-1 font-bold text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors text-left"
             >
               <span className="transition-transform duration-200 transform">
                 {globalResolverOpen ? (
-                  <ChevronDown className="w-3.5 h-3.5 text-gray-600 flex-shrink-0" />
+                  <ChevronDown className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400 flex-shrink-0" />
                 ) : (
-                  <ChevronRight className="w-3.5 h-3.5 text-gray-600 flex-shrink-0" />
+                  <ChevronRight className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400 flex-shrink-0" />
                 )}
               </span>
               <span>Global Resolver</span>
             </button>
 
             <div
-              className={`pl-6 pr-2 py-1 space-y-1 text-gray-600 overflow-hidden transition-all duration-200 ease-in-out ${
+              className={`pl-6 pr-2 py-1 space-y-1 text-gray-600 dark:text-gray-400 overflow-hidden transition-all duration-200 ease-in-out ${
                 globalResolverOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0 py-0"
               }`}
             >
@@ -115,23 +115,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onClose }) 
           </div>
 
           {/* Accordion 2: VPC Resolver */}
-          <div className="mt-2 pt-2 border-t border-gray-100">
+          <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-800">
             <button
               onClick={() => setVpcResolverOpen(!vpcResolverOpen)}
-              className="w-full flex items-center justify-start gap-1 px-3 py-1 font-bold text-gray-900 hover:bg-gray-50 transition-colors text-left"
+              className="w-full flex items-center justify-start gap-1 px-3 py-1 font-bold text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors text-left"
             >
               <span className="transition-transform duration-200 transform">
                 {vpcResolverOpen ? (
-                  <ChevronDown className="w-3.5 h-3.5 text-gray-600 flex-shrink-0" />
+                  <ChevronDown className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400 flex-shrink-0" />
                 ) : (
-                  <ChevronRight className="w-3.5 h-3.5 text-gray-600 flex-shrink-0" />
+                  <ChevronRight className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400 flex-shrink-0" />
                 )}
               </span>
               <span>VPC Resolver</span>
             </button>
 
             <div
-              className={`pl-6 pr-2 py-1 space-y-1 text-gray-600 overflow-hidden transition-all duration-200 ease-in-out ${
+              className={`pl-6 pr-2 py-1 space-y-1 text-gray-600 dark:text-gray-400 overflow-hidden transition-all duration-200 ease-in-out ${
                 vpcResolverOpen ? "max-h-60 opacity-100" : "max-h-0 opacity-0 py-0"
               }`}
             >

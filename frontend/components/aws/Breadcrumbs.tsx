@@ -15,7 +15,7 @@ interface BreadcrumbsProps {
 
 export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items }) => {
   return (
-    <nav className="flex items-center space-x-1 text-xs text-gray-500 py-2 px-6 bg-white border-b border-gray-200 select-none">
+    <nav className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400 py-2 px-6 bg-white dark:bg-[#161b22] border-b border-gray-200 dark:border-gray-800 select-none transition-colors">
       <Link href="/hosted-zones" className="hover:text-aws-blue transition-colors">
         Route 53
       </Link>
@@ -27,7 +27,7 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items }) => {
               {item.label}
             </Link>
           ) : (
-            <span className="font-medium text-gray-900">{item.label}</span>
+            <span className="font-medium text-gray-900 dark:text-white">{item.label}</span>
           )}
         </React.Fragment>
       ))}

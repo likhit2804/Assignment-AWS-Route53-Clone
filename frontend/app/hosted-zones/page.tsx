@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Plus, Trash2, Search, RefreshCw, Download, Upload, ExternalLink, Globe, Lock, ChevronRight, ChevronLeft, CheckCircle2, X } from "lucide-react";
 import { api } from "@/lib/api";
 import { HostedZone, ZoneType } from "@/types";
@@ -283,8 +283,9 @@ function SkeletonZoneRow() {
 }
 
 // ── Hosted Zones Table Page ────────────────────────────────────────────
-export default function HostedZonesPage() {
+function HostedZonesInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [zones, setZones] = useState<HostedZone[]>([]);
   const [total, setTotal] = useState(0);
   const [pages, setPages] = useState(1);
@@ -300,6 +301,7 @@ export default function HostedZonesPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [createdBannerZone, setCreatedBannerZone] = useState<string | null>(null);
+  const [deletedBannerZone, setDeletedBannerZone] = useState<string | null>(searchParams.get("deleted"));
 
   const fetchZones = useCallback(async () => {
     setLoading(true);
@@ -364,6 +366,26 @@ export default function HostedZonesPage() {
       <Breadcrumbs items={[{ label: "Hosted zones" }]} />
 
       {/* ── Green Success Banner ── */}
+      {deletedBannerZone && (
+        <div
+          role="alert"
+          className="flex items-start gap-3 bg-[#1d6535] text-white px-5 py-3 text-sm"
+          style={{ animation: "slideDown 0.3s ease" }}
+        >
+          <CheckCircle2 className="w-5 h-5 mt-0.5 flex-shrink-0 text-green-300" />
+          <div className="flex-1">
+            <span className="font-semibold">Successfully deleted hosted zone: {deletedBannerZone}</span>
+          </div>
+          <button
+            onClick={() => setDeletedBannerZone(null)}
+            className="text-green-200 hover:text-white ml-2 mt-0.5 flex-shrink-0"
+            aria-label="Dismiss"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {createdBannerZone && (
         <div
           role="alert"
@@ -388,13 +410,13 @@ export default function HostedZonesPage() {
       )}
 
       {/* Page Header */}
-      <div className="px-6 py-4 border-b border-gray-200 bg-white">
+      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#0f141c] transition-colors">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              Hosted zones <span className="text-gray-500 font-normal">({total})</span>
+            <h1 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              Hosted zones <span className="text-gray-500 dark:text-gray-400 font-normal">({total})</span>
             </h1>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               Automatic mode is the current search behavior optimized for best filter results.
             </p>
           </div>
@@ -405,7 +427,7 @@ export default function HostedZonesPage() {
               onClick={fetchZones}
               disabled={loading}
               title="Refresh"
-              className="p-1.5 text-aws-blue hover:bg-gray-100 rounded-full border border-gray-300 flex items-center justify-center transition-colors disabled:opacity-50"
+              className="p-1.5 text-aws-blue hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full border border-gray-300 dark:border-gray-700 flex items-center justify-center transition-colors disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
             </button>
@@ -451,7 +473,7 @@ export default function HostedZonesPage() {
       </div>
 
       {/* Filters & Actions Bar */}
-      <div className="px-6 py-2.5 bg-gray-50 border-b border-gray-200 flex items-center gap-3 flex-wrap">
+      <div className="px-6 py-2.5 bg-gray-50 dark:bg-[#0f141c]/40 border-b border-gray-200 dark:border-gray-800 flex items-center gap-3 flex-wrap transition-colors">
         <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 flex-1 min-w-48">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-2.5 top-2 w-3.5 h-3.5 text-gray-400" />
@@ -460,7 +482,7 @@ export default function HostedZonesPage() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Filter records by property or value"
-              className="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:border-aws-blue focus:ring-1 focus:ring-aws-blue"
+              className="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#0f141c] text-gray-800 dark:text-gray-100 rounded focus:outline-none focus:border-aws-blue focus:ring-1 focus:ring-aws-blue transition-colors"
             />
           </div>
           <Button type="submit" variant="secondary" size="sm">Search</Button>
@@ -469,17 +491,17 @@ export default function HostedZonesPage() {
         <select
           value={filterType}
           onChange={(e) => { setFilterType(e.target.value); setPage(1); }}
-          className="text-xs border border-gray-300 rounded px-2.5 py-1.5 focus:outline-none focus:border-aws-blue text-gray-700"
+          className="text-xs border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#0f141c] text-gray-700 dark:text-gray-250 rounded px-2.5 py-1.5 focus:outline-none focus:border-aws-blue transition-colors"
         >
           <option value="">All types</option>
-          <option value="Public">Public</option>
-          <option value="Private">Private</option>
+          <option value="Public" className="bg-white dark:bg-[#0f141c]">Public</option>
+          <option value="Private" className="bg-white dark:bg-[#0f141c]">Private</option>
         </select>
       </div>
 
       {/* Error Banner */}
       {error && (
-        <div className="mx-6 mt-3 text-xs text-red-700 bg-red-50 border border-red-200 rounded px-3 py-2">
+        <div className="mx-6 mt-3 text-xs text-red-700 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 rounded px-3 py-2">
           ⚠ {error}
         </div>
       )}
@@ -489,7 +511,7 @@ export default function HostedZonesPage() {
         <div className="flex-1 overflow-auto">
           <table className="w-full text-xs border-collapse">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
+              <tr className="bg-gray-50 dark:bg-[#0f141c] border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10 transition-colors">
                 <th className="w-10 px-4 py-2.5">
                   <input
                     type="checkbox"
@@ -498,12 +520,12 @@ export default function HostedZonesPage() {
                     className="accent-aws-blue cursor-pointer"
                   />
                 </th>
-                <th className="text-left px-3 py-2.5 font-semibold text-gray-700">Domain name</th>
-                <th className="text-left px-3 py-2.5 font-semibold text-gray-700">Type</th>
-                <th className="text-left px-3 py-2.5 font-semibold text-gray-700">Record count</th>
-                <th className="text-left px-3 py-2.5 font-semibold text-gray-700">Hosted zone ID</th>
-                <th className="text-left px-3 py-2.5 font-semibold text-gray-700">Description</th>
-                <th className="w-24 px-3 py-2.5 font-semibold text-gray-700 text-right">Actions</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-gray-700 dark:text-gray-300">Domain name</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-gray-700 dark:text-gray-300">Type</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-gray-700 dark:text-gray-300">Record count</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-gray-700 dark:text-gray-300">Hosted zone ID</th>
+                <th className="text-left px-3 py-2.5 font-semibold text-gray-700 dark:text-gray-300">Description</th>
+                <th className="w-24 px-3 py-2.5 font-semibold text-gray-700 dark:text-gray-300 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -532,8 +554,8 @@ export default function HostedZonesPage() {
               {!loading && zones.map((zone) => (
                 <tr
                   key={zone.id}
-                  className={`border-b border-gray-100 transition-colors cursor-pointer ${
-                    selectedIds.has(zone.id) ? "bg-aws-rowActive" : "hover:bg-aws-rowHover"
+                  className={`border-b border-gray-100 dark:border-gray-800 transition-colors cursor-pointer ${
+                    selectedIds.has(zone.id) ? "bg-aws-rowActive dark:bg-[#202734]" : "hover:bg-aws-rowHover dark:hover:bg-[#202734]/50"
                   }`}
                   onClick={() => router.push(`/hosted-zones/${zone.id}`)}
                 >
@@ -553,7 +575,7 @@ export default function HostedZonesPage() {
                   </td>
                   <td className="px-3 py-2.5">
                     <button
-                      className="text-aws-blue hover:underline font-medium flex items-center gap-1"
+                      className="text-aws-blue dark:text-blue-400 hover:underline font-medium flex items-center gap-1"
                       onClick={(e) => { e.stopPropagation(); router.push(`/hosted-zones/${zone.id}`); }}
                     >
                       {zone.name}
@@ -566,9 +588,9 @@ export default function HostedZonesPage() {
                       {zone.zone_type}
                     </Badge>
                   </td>
-                  <td className="px-3 py-2.5 text-gray-600 font-mono">{zone.record_count}</td>
-                  <td className="px-3 py-2.5 font-mono text-gray-500 text-[11px]">{zone.id}</td>
-                  <td className="px-3 py-2.5 text-gray-500 max-w-xs truncate">{zone.description || "—"}</td>
+                  <td className="px-3 py-2.5 text-gray-600 dark:text-gray-300 font-mono">{zone.record_count}</td>
+                  <td className="px-3 py-2.5 font-mono text-gray-500 dark:text-gray-400 text-[11px]">{zone.id}</td>
+                  <td className="px-3 py-2.5 text-gray-500 dark:text-gray-400 max-w-xs truncate">{zone.description || "—"}</td>
                   <td className="px-3 py-2.5 text-right">
                     <a
                       href={api.exportBindUrl(zone.id)}
@@ -576,7 +598,7 @@ export default function HostedZonesPage() {
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
                       title="Export BIND zone file"
-                      className="text-gray-400 hover:text-aws-blue transition-colors inline-flex p-1 rounded hover:bg-blue-50"
+                      className="text-gray-400 hover:text-aws-blue transition-colors inline-flex p-1 rounded hover:bg-blue-50 dark:hover:bg-gray-800"
                     >
                       <Download className="w-3.5 h-3.5" />
                     </a>
@@ -592,9 +614,9 @@ export default function HostedZonesPage() {
           const selectedZone = zones.find((z) => selectedIds.has(z.id));
           if (!selectedZone) return null;
           return (
-            <div className="w-80 border-l border-gray-200 bg-white p-5 overflow-auto text-xs space-y-5 flex-shrink-0 animate-fadeIn">
-              <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-                <h3 className="font-bold text-sm text-gray-900">Hosted zone details</h3>
+            <div className="w-80 border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-[#0f141c] p-5 overflow-auto text-xs space-y-5 flex-shrink-0 animate-fadeIn transition-colors">
+              <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3">
+                <h3 className="font-bold text-sm text-gray-900 dark:text-white">Hosted zone details</h3>
                 <button
                   onClick={() => setSelectedIds(new Set())}
                   className="text-gray-400 hover:text-gray-600 text-lg leading-none"
@@ -606,35 +628,35 @@ export default function HostedZonesPage() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-gray-500 font-medium block mb-0.5">Hosted zone name</label>
-                  <span className="text-gray-900 font-semibold text-sm">{selectedZone.name}</span>
+                  <label className="text-gray-500 dark:text-gray-400 font-medium block mb-0.5">Hosted zone name</label>
+                  <span className="text-gray-900 dark:text-white font-semibold text-sm">{selectedZone.name}</span>
                 </div>
 
                 <div>
-                  <label className="text-gray-500 font-medium block mb-0.5">Hosted zone ID</label>
-                  <span className="text-gray-700 font-mono text-[11px] bg-gray-50 px-1.5 py-0.5 rounded border border-gray-200 block truncate">
+                  <label className="text-gray-500 dark:text-gray-400 font-medium block mb-0.5">Hosted zone ID</label>
+                  <span className="text-gray-700 dark:text-gray-300 font-mono text-[11px] bg-gray-50 dark:bg-[#0f141c] px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-800 block truncate">
                     {selectedZone.id}
                   </span>
                 </div>
 
                 <div>
-                  <label className="text-gray-500 font-medium block mb-0.5">Description</label>
-                  <span className="text-gray-700">{selectedZone.description || "—"}</span>
+                  <label className="text-gray-500 dark:text-gray-400 font-medium block mb-0.5">Description</label>
+                  <span className="text-gray-700 dark:text-gray-300">{selectedZone.description || "—"}</span>
                 </div>
 
                 <div>
-                  <label className="text-gray-500 font-medium block mb-0.5">Type</label>
-                  <span className="text-gray-700">{selectedZone.zone_type} hosted zone</span>
+                  <label className="text-gray-500 dark:text-gray-400 font-medium block mb-0.5">Type</label>
+                  <span className="text-gray-700 dark:text-gray-300">{selectedZone.zone_type} hosted zone</span>
                 </div>
 
                 <div>
-                  <label className="text-gray-500 font-medium block mb-0.5">Record count</label>
-                  <span className="text-gray-900 font-mono font-semibold">{selectedZone.record_count}</span>
+                  <label className="text-gray-500 dark:text-gray-400 font-medium block mb-0.5">Record count</label>
+                  <span className="text-gray-900 dark:text-white font-mono font-semibold">{selectedZone.record_count}</span>
                 </div>
 
-                <div className="pt-2 border-t border-gray-100">
-                  <label className="text-gray-500 font-medium block mb-1.5">Name servers</label>
-                  <ul className="space-y-1 font-mono text-[11px] text-gray-700 list-disc list-inside bg-gray-50 p-2.5 rounded border border-gray-200">
+                <div className="pt-2 border-t border-gray-100 dark:border-gray-800">
+                  <label className="text-gray-500 dark:text-gray-400 font-medium block mb-1.5">Name servers</label>
+                  <ul className="space-y-1 font-mono text-[11px] text-gray-700 dark:text-gray-300 list-disc list-inside bg-gray-50 dark:bg-[#0f141c] p-2.5 rounded border border-gray-200 dark:border-gray-800">
                     <li>ns-1.awsdns-01.com.</li>
                     <li>ns-2.awsdns-01.net.</li>
                     <li>ns-3.awsdns-01.org.</li>
@@ -649,7 +671,7 @@ export default function HostedZonesPage() {
 
       {/* Pagination Footer */}
       {pages > 1 && (
-        <div className="border-t border-gray-200 px-6 py-2.5 bg-white flex items-center justify-between text-xs text-gray-500">
+        <div className="border-t border-gray-200 dark:border-gray-800 px-6 py-2.5 bg-white dark:bg-[#0f141c] flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 transition-colors">
           <span>Showing page {page} of {pages} ({total} total)</span>
           <div className="flex items-center gap-2">
             <Button variant="secondary" size="sm" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>
@@ -698,5 +720,13 @@ export default function HostedZonesPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function HostedZonesPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-32 text-gray-400 text-sm">Loading...</div>}>
+      <HostedZonesInner />
+    </Suspense>
   );
 }
