@@ -15,19 +15,24 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.database import init_db
+from backend.seed_db import auto_seed_if_empty
 from backend.routers import auth, hosted_zones, records, bind
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    Startup: Initialize SQLite database tables.
+    Startup: Initialize SQLite database tables and auto-seed if empty.
     Shutdown: (nothing needed — aiosqlite handles connection cleanup).
     
     Decision: asynccontextmanager lifespan replaces deprecated @app.on_event("startup").
     This is the FastAPI 0.93+ recommended pattern.
     """
     await init_db()
+    try:
+        await auto_seed_if_empty()
+    except Exception as e:
+        print(f"Failed to auto-seed database: {e}")
     yield
 
 
