@@ -57,6 +57,7 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "https://assignment-aws-route53clone.vercel.app",
         "https://assignment-aws-route53-clone-one.vercel.app",
+        "https://aws-route53-clone-likhit.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
