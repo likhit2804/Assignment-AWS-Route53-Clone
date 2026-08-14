@@ -34,14 +34,14 @@ function CreateZoneModal({ onClose, onCreated }: { onClose: () => void; onCreate
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg border border-gray-200">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg border border-gray-200 flex flex-col max-h-[90vh]">
         {/* Modal Header */}
         <div className="bg-aws-nav text-white px-6 py-4 rounded-t-lg flex items-center justify-between">
           <h2 className="font-bold text-sm">Create hosted zone</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white text-lg leading-none">&times;</button>
         </div>
 
-        <form onSubmit={submit} className="p-6 space-y-5">
+        <form onSubmit={submit} className="p-6 space-y-5 overflow-y-auto flex-1">
           {error && (
             <div className="text-xs text-red-700 bg-red-50 border border-red-200 rounded px-3 py-2">
               ⚠ {error}

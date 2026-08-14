@@ -553,7 +553,7 @@ function ImportBindModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 select-none">
-      <div className="bg-white dark:bg-[#0f141c] border border-gray-200 dark:border-gray-800 rounded-lg shadow-xl w-full max-w-2xl overflow-hidden animate-fadeIn text-xs transition-colors">
+      <div className="bg-white dark:bg-[#0f141c] border border-gray-200 dark:border-gray-800 rounded-lg shadow-xl w-full max-w-2xl overflow-hidden animate-fadeIn text-xs transition-colors flex flex-col max-h-[90vh]">
         {/* Modal Header */}
         <div className="bg-gray-50 dark:bg-[#0f141c] border-b border-gray-200 dark:border-gray-800 px-5 py-3 flex items-center justify-between transition-colors">
           <h3 className="font-bold text-sm text-gray-900 dark:text-white">Import zone file</h3>
@@ -561,7 +561,7 @@ function ImportBindModal({
         </div>
 
         {/* Modal Body */}
-        <div className="p-5 space-y-4 text-gray-700 dark:text-gray-300">
+        <div className="p-5 space-y-4 text-gray-700 dark:text-gray-300 overflow-y-auto flex-1">
           <div className="p-3 bg-blue-50 dark:bg-blue-955/10 border border-blue-200 dark:border-blue-900 rounded text-blue-900 dark:text-blue-300 text-[11px] leading-relaxed">
             <strong>Supported records:</strong> A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, PTR. Standard zone file directives like <code>$TTL</code> and <code>$ORIGIN</code> are parsed. Existing records with identical name, type, and values will not be duplicated.
           </div>

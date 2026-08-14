@@ -130,7 +130,7 @@ function CreateRecordInner() {
   const cleanZoneName = zone ? zone.name.replace(/\.$/, "") : "";
 
   return (
-    <div className="flex flex-col h-full bg-[#f8f9fa] dark:bg-[#0f141c] text-xs transition-colors">
+    <div className="flex flex-col h-full overflow-y-auto bg-[#f8f9fa] dark:bg-[#0f141c] text-xs transition-colors">
       <Breadcrumbs
         items={[
           { label: "Hosted zones", href: "/hosted-zones" },
