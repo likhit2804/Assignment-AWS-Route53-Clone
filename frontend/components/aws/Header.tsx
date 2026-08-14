@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Search, Globe, ChevronDown, Bell, HelpCircle, Settings, Terminal, Grid, Menu, User, LogOut, LogIn, Check, Sun, Moon, X } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { api } from "@/lib/api";
 import { AwsLogoWithSmile } from "./Route53Icons";
 
 interface HeaderProps {
@@ -97,7 +99,20 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState("Recently visited");
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const router = useRouter();
+  const [user, setUser] = useState<{ username: string; account_id: string } | null>(null);
+
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const u = await api.getMe();
+        setUser(u);
+      } catch (err) {
+        // Not logged in or on landing page
+      }
+    }
+    loadUser();
+  }, []);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Keyboard shortcut: Alt+S, Shift+Alt+S, Ctrl+K, or '/' to focus search bar
@@ -178,10 +193,11 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
     }
   };
 
-  const toggleAuth = () => {
-    const nextState = !isLoggedIn;
-    setIsLoggedIn(nextState);
-    localStorage.setItem("aws_route53_auth", String(nextState));
+  const handleSignOut = async () => {
+    try {
+      await api.logout();
+    } catch {}
+    router.push("/signin");
   };
 
   return (
@@ -315,9 +331,11 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             >
               <div className="flex flex-col items-end leading-none">
                 <span className="font-semibold text-xs text-gray-100 flex items-center gap-1">
-                  likhit2804 (106731597972)
+                  {user ? `${user.username} (${user.account_id})` : "likhit2804 (106731597972)"}
                 </span>
-                <span className="text-[10px] text-gray-400 font-mono mt-0.5">likhit2804</span>
+                <span className="text-[10px] text-gray-400 font-mono mt-0.5">
+                  {user ? user.username : "likhit2804"}
+                </span>
               </div>
               <ChevronDown className="w-3 h-3 text-gray-400" />
             </button>
@@ -327,8 +345,8 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               <div className="absolute right-0 mt-2 w-64 bg-white text-gray-800 rounded shadow-xl border border-gray-200 z-50 text-xs p-3">
                 <div className="border-b pb-2 mb-2">
                   <p className="font-bold text-gray-900">AWS Account Details</p>
-                  <p className="text-gray-500 font-mono text-[11px] mt-0.5">Account ID: 106731597972</p>
-                  <p className="text-gray-500 text-[11px]">IAM User: likhit2804</p>
+                  <p className="text-gray-500 font-mono text-[11px] mt-0.5">Account ID: {user ? user.account_id : "106731597972"}</p>
+                  <p className="text-gray-500 text-[11px]">IAM User: {user ? user.username : "likhit2804"}</p>
                 </div>
 
                 <div className="space-y-1 py-1">
@@ -342,17 +360,16 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
 
                 <div className="border-t pt-2 mt-2">
                   <button
-                    onClick={toggleAuth}
+                    onClick={handleSignOut}
                     className="w-full flex items-center justify-between px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded transition-colors"
                   >
                     <span className="flex items-center gap-1.5">
-                      {isLoggedIn ? <LogOut className="w-3.5 h-3.5 text-red-600" /> : <LogIn className="w-3.5 h-3.5 text-green-600" />}
-                      {isLoggedIn ? "Sign Out (Mock Auth)" : "Sign In (Mock Auth)"}
+                      <LogOut className="w-3.5 h-3.5 text-red-600" />
+                      Sign Out
                     </span>
-                    {isLoggedIn && <Check className="w-3.5 h-3.5 text-green-600" />}
                   </button>
                   <p className="text-[10px] text-gray-500 mt-1 text-center">
-                    Session state: {isLoggedIn ? "Authenticated" : "Logged Out"}
+                    Session state: {user ? "Authenticated" : "Not Authenticated"}
                   </p>
                 </div>
               </div>

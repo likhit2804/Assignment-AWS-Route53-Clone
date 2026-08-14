@@ -23,6 +23,13 @@ MOCK_USERS = {
         "email": "admin@example.com",
         "account_id": "123456789012",
         "display_name": "AWS Admin",
+    },
+    "likhit2804": {
+        "username": "likhit2804",
+        "password": "password",
+        "email": "likhit@example.com",
+        "account_id": "106731597972",
+        "display_name": "likhit2804",
     }
 }
 

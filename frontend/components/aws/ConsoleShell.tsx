@@ -1,13 +1,51 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { Header } from "@/components/aws/Header";
 import { Sidebar } from "@/components/aws/Sidebar";
 import { Footer } from "@/components/aws/Footer";
 import { Menu } from "lucide-react";
+import { api } from "@/lib/api";
 
 export function ConsoleShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const pathname = usePathname();
+  const router = useRouter();
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    async function checkAuth() {
+      // Don't guard sign-in and landing routes
+      if (pathname === "/signin" || pathname === "/") {
+        setCheckingAuth(false);
+        return;
+      }
+      try {
+        await api.getMe();
+        setCheckingAuth(false);
+      } catch (err) {
+        // Redirection to sign-in page if not authenticated
+        router.push("/signin");
+      }
+    }
+    checkAuth();
+  }, [pathname, router]);
+
+  const isSignInPage = pathname === "/signin";
+
+  if (isSignInPage) {
+    return <>{children}</>;
+  }
+
+  if (checkingAuth && pathname !== "/") {
+    return (
+      <div className="min-h-screen bg-[#0f141c] flex flex-col items-center justify-center text-xs text-gray-400 font-sans">
+        <div className="w-8 h-8 border-2 border-t-aws-blue border-gray-700 rounded-full animate-spin mb-4"></div>
+        <span>Verifying AWS identity session...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col font-sans antialiased text-aws-text dark:text-gray-200 bg-[#f2f3f3] dark:bg-[#0f141c] transition-colors">
