@@ -49,11 +49,15 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS — allow local development servers and all Vercel deployments dynamically
+# CORS — restrict origins to local development and specific Vercel production domains
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
-    allow_origin_regex="https://.*\\.vercel\\.app",
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://assignment-aws-route53clone.vercel.app",
+        "https://assignment-aws-route53-clone-one.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
