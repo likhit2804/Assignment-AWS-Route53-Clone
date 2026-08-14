@@ -186,8 +186,7 @@ async def seed():
 
     print("Seeding hosted zones and records...")
     async with AsyncSessionLocal() as session:
-        async with session.begin():
-            await seed_data_only(session)
+        await seed_data_only(session)
         await session.commit()
     print("Database successfully seeded with 25 Hosted Zones and 35 DNS Records inside example.com!")
 
@@ -199,8 +198,7 @@ async def auto_seed_if_empty():
         count = result.scalar_one()
         if count == 0:
             print("Database is empty. Initiating auto-seed...")
-            async with session.begin():
-                await seed_data_only(session)
+            await seed_data_only(session)
             await session.commit()
             print("Auto-seed completed successfully!")
         else:

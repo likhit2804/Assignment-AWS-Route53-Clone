@@ -1,7 +1,11 @@
 import { HostedZone, DNSRecord, UserSession, RecordType, RoutingPolicy, ZoneType } from "@/types";
 
-const rawUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
-const API_BASE_URL = rawUrl.replace(/\/+$/, "");
+let rawUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+rawUrl = rawUrl.replace(/\/+$/, "");
+if (!rawUrl.endsWith("/api")) {
+  rawUrl = `${rawUrl}/api`;
+}
+const API_BASE_URL = rawUrl;
 
 async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE_URL}${endpoint}`, {
