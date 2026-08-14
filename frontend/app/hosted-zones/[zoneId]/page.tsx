@@ -943,6 +943,13 @@ function ZoneDetailInner() {
             </Button>
           </a>
 
+          <a href={api.exportJsonUrl(zoneId)} target="_blank" rel="noopener noreferrer">
+            <Button variant="secondary" size="sm">
+              <Download className="w-3.5 h-3.5" />
+              Export JSON
+            </Button>
+          </a>
+
           <Button variant="primary" size="sm" onClick={() => router.push(`/hosted-zones/${zoneId}/create-record`)}>
             <Plus className="w-3.5 h-3.5" />
             Create record

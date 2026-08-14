@@ -113,10 +113,48 @@ CREATE TABLE dns_records (
 
 ---
 
-## ⭐ Bonus & Advanced Features
+## 🌱 Database Seeding & Mock Data
+
+The project contains a pre-built seeder containing **25 mock Hosted Zones** and **35 DNS Records** (inside `example.com`) to make it easy to test pagination, record filters, and searches.
+
+### Auto-Seed on Startup
+The backend automatically executes the auto-seed routine whenever the FastAPI server starts.
+- **If the database is empty**: It automatically triggers the seeder and populates the data.
+- **If the database already contains zones**: It exits silently to prevent overwriting your existing data.
+
+### Manual Seed
+If you want to force a clean database wipe and re-seed, run:
+```bash
+cd backend
+python seed_db.py
+```
+
+---
+
+## ☁️ Production Deployment
+
+### Frontend (Vercel)
+1. Import the repository in **Vercel**.
+2. Set the **Root Directory** to `frontend`.
+3. Add the following **Environment Variable**:
+   - `NEXT_PUBLIC_API_URL`: Your backend Render URL (e.g. `https://your-backend.onrender.com`) without a trailing slash.
+
+### Backend (Render)
+1. Create a new **Web Service** in **Render** and link your repo.
+2. Set the **Root Directory** to `backend`.
+3. Configure the commands:
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+4. Add a **Persistent Disk** (under the Disks tab) mounted at `/data`.
+5. Add the following **Environment Variable**:
+   - `DATABASE_URL`: `sqlite+aiosqlite:////data/route53.db`
+
+---
+
+## ⭐ Key Features
 
 1. **BIND Import & Export**: Import records directly from BIND zone files and export zones in BIND or JSON format.
-2. **AWS Modal Security**: Delete confirmation modals require typing `delete` before enabling execution.
-3. **Keyboard Shortcuts**: Press `Alt+S`, `/`, or `Ctrl+K` from anywhere in the console to instantly focus top header search.
-4. **Auto-seeded DNS Records**: Creating a zone automatically provisions default `NS` (with 4 nameservers) and `SOA` records.
-5. **Bulk Operations**: Bulk checkbox selection and bulk deletion for zones and records.
+2. **Dynamic Live Notifications**: Dashboard includes dynamic systems operations status logs and synced change alerts.
+3. **AWS Modal Security**: Delete confirmation modals require typing `delete` before enabling execution.
+4. **Keyboard Shortcuts**: Press `Alt+S`, `/`, or `Ctrl+K` from anywhere in the console to focus top header search.
+5. **Table Pagination & Pinned Footers**: Pagination footers are locked to the bottom of the viewport for comfortable scrolling.

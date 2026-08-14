@@ -307,7 +307,7 @@ function HostedZonesInner() {
     setLoading(true);
     setError("");
     try {
-      const data = await api.getHostedZones({ search, zone_type: filterType || undefined, page, limit: 25 });
+      const data = await api.getHostedZones({ search, zone_type: filterType || undefined, page, limit: 10 });
       setZones(data.hosted_zones);
       setTotal(data.total);
       setPages(data.pages);

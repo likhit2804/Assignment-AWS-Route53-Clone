@@ -10,6 +10,33 @@ export default function Route53DashboardPage() {
   const [domainCheckInput, setDomainCheckInput] = useState("");
   const [searchNotification, setSearchNotification] = useState("");
   const [checkResult, setCheckResult] = useState<string | null>(null);
+  const [notifications] = useState([
+    {
+      resource: "example.com (Hosted Zone)",
+      status: "SYNC_COMPLETE - All 35 DNS records successfully initialized",
+      update: "Just now"
+    },
+    {
+      resource: "internal.net (Hosted Zone)",
+      status: "SYNC_COMPLETE - VPC association vpc-0a8b9c1d2e3f4a5b6 verified",
+      update: "5 mins ago"
+    },
+    {
+      resource: "Route 53 Database Seeder",
+      status: "SUCCESS - Seeding of 25 zones completed with zero errors",
+      update: "10 mins ago"
+    },
+    {
+      resource: "Route 53 Resolver Rule",
+      status: "ACTIVE - Forwarding rules for outbound endpoints initialized",
+      update: "2 hours ago"
+    }
+  ]);
+
+  const filteredNotifications = notifications.filter(notif =>
+    notif.resource.toLowerCase().includes(searchNotification.toLowerCase()) ||
+    notif.status.toLowerCase().includes(searchNotification.toLowerCase())
+  );
 
   const handleDomainCheck = () => {
     if (!domainCheckInput.trim()) return;
@@ -189,14 +216,32 @@ export default function Route53DashboardPage() {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td
-                  colSpan={3}
-                  className="px-4 py-8 text-center text-gray-500 dark:text-gray-400 text-xs bg-white dark:bg-[#16191f] transition-colors"
-                >
-                  No notifications to display
-                </td>
-              </tr>
+              {filteredNotifications.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={3}
+                    className="px-4 py-8 text-center text-gray-500 dark:text-gray-400 text-xs bg-white dark:bg-[#16191f] transition-colors"
+                  >
+                    No notifications to display
+                  </td>
+                </tr>
+              ) : (
+                filteredNotifications.map((notif, index) => (
+                  <tr key={index} className="border-b border-gray-150 dark:border-gray-800 last:border-0 hover:bg-gray-50 dark:hover:bg-[#1c222c] transition-colors">
+                    <td className="px-4 py-3 font-semibold text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-800">{notif.resource}</td>
+                    <td className="px-4 py-3 text-gray-700 dark:text-gray-300 border-r border-gray-200 dark:border-gray-800">
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold ${
+                        notif.status.includes("SUCCESS") || notif.status.includes("SYNC_COMPLETE") || notif.status.includes("ACTIVE")
+                          ? "bg-green-50 dark:bg-green-955/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-900"
+                          : "bg-blue-50 dark:bg-blue-955/20 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900"
+                      }`}>
+                        {notif.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{notif.update}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
